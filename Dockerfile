@@ -39,7 +39,8 @@ RUN  pip install -U pip \
  moviepy \
  tensorflow \
  keras \
- autovizwidget
+ autovizwidget \
+ opencv-python
 
 # Install tensorflow models object detection
 RUN GIT_SSL_NO_VERIFY=true git clone -q https://github.com/tensorflow/models /usr/local/lib/python3.5/dist-packages/tensorflow/models
@@ -60,17 +61,17 @@ RUN cd /usr/local/src/ \
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 # Download & build OpenCV
-RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/opencv/opencv/archive/3.4.1.zip
-RUN cd /usr/local/src/ \
- && unzip 3.4.1.zip \
- && rm 3.4.1.zip \
- && cd /usr/local/src/opencv-3.4.1/ \
- && mkdir build \
- && cd /usr/local/src/opencv-3.4.1/build \ 
- && cmake -D CMAKE_INSTALL_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local/ .. \
- && make -j4 \
- && make install \
- && rm -rf /usr/local/src/opencv-3.4.1
+#RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/opencv/opencv/archive/3.4.1.zip
+#RUN cd /usr/local/src/ \
+# && unzip 3.4.1.zip \
+# && rm 3.4.1.zip \
+# && cd /usr/local/src/opencv-3.4.1/ \
+# && mkdir build \
+# && cd /usr/local/src/opencv-3.4.1/build \ 
+# && cmake -D CMAKE_INSTALL_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local/ .. \
+# && make -j4 \
+# && make install \
+# && rm -rf /usr/local/src/opencv-3.4.1
 
 # Setting up working directory 
 RUN mkdir /lab
@@ -85,4 +86,6 @@ RUN (apt-get autoremove -y; \
 ENV PYTHONPATH "$PYTHONPATH:/usr/local/lib/python3.5/dist-packages/tensorflow/models/research:/usr/local/lib/python3.5/dist-packages/tensorflow/models/research/slim"
 RUN cd /usr/local/lib/python3.5/dist-packages/tensorflow/models/research && protoc object_detection/protos/*.proto --python_out=.
 
-CMD bash exec.sh
+COPY docker-entrypoint.sh .
+RUN chmod 755 ./docker-entrypoint.sh
+CMD bash ./docker-entrypoint.sh

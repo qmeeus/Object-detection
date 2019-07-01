@@ -32,6 +32,8 @@ if __name__ == '__main__':
                         default=0, help='enable full screen')
     args = vars(ap.parse_args())
 
+    import pdb; pdb.set_trace()
+
     # Use realtime function if no video has been provided
     if args['input_videos'] == "":
         realtime(args)
