@@ -1,11 +1,11 @@
-from __future__ import print_function
-from utils.app_utils import *
-from utils.objDet_utils import *
-import argparse
 import multiprocessing
 from multiprocessing import Queue, Pool
 from queue import PriorityQueue
 import cv2
+
+
+from utils.app_utils import *
+from utils.detection import *
 
 
 def video(args):
