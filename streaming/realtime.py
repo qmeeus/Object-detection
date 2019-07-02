@@ -26,7 +26,7 @@ def realtime(args):
     # Multiprocessing: Init input and output Queue and pool of workers
     input_q = Queue(maxsize=args["queue_size"])
     output_q = Queue(maxsize=args["queue_size"])
-    pool = Pool(args["num_workers"], worker, (input_q,output_q))
+    pool = Pool(args["num_workers"], worker, (input_q, output_q))
 
     # created a threaded video stream and start the FPS counter
     vs = WebcamVideoStream(src=args["input_device"]).start()
@@ -36,7 +36,7 @@ def realtime(args):
     if args["output"]:
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         out = cv2.VideoWriter('outputs/{}.avi'.format(args["output_name"]),
-                              fourcc, vs.getFPS()/args["num_workers"], (vs.getWidth(), vs.getHeight()))
+                              fourcc, vs.getFPS() / args["num_workers"], (vs.getWidth(), vs.getHeight()))
 
 
     # Start reading and treating the video stream
