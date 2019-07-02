@@ -1,6 +1,7 @@
 datasets/
 embedding/
 outputs/
+inputs/
 tmp/
 test_data/
 preprocessed_data/

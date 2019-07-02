@@ -1,9 +1,13 @@
 FROM tensorflow/tensorflow:nightly-devel-py3
 
 ENV DEBIAN_FRONTEND=noninteractive
-COPY requirements.txt ./
 
-RUN apt update && apt install -y python3 \
+ENV PY_VERSION=3.6.1
+ENV PY_V=3.6
+
+WORKDIR /tmp
+
+RUN add-apt-repository ppa:jonathonf/python-3.6 && apt update && apt install -y python3 \
     python3-dev \
     python-pil \
     python-lxml \
@@ -21,8 +25,8 @@ RUN apt update && apt install -y python3 \
     libjpeg-dev \
     libpng-dev \
     libtiff-dev \
-    libjasper-dev \
-    libdc1394-22-dev \
+#    libjasper-dev \
+#    libdc1394-22-dev \
     x11-apps \
     wget \
     vim \
@@ -30,13 +34,13 @@ RUN apt update && apt install -y python3 \
     unzip \
     && rm -rf /var/lib/apt/lists/* 
 
-# Install core packages 
-#RUN wget -q -O /tmp/get-pip.py --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 /tmp/get-pip.py
+COPY requirements.txt ./
 RUN  pip install -U pip && pip install -r requirements.txt
 
 # Install tensorflow models object detection
 RUN PY_VERSION=$(python --version | cut -d" " -f2)
 RUN PYV=$(echo $PY_VERSION | cut -d"." -f1,2)
+RUN echo $(python --version | cut -d" " -f2) $PY_VERSION $PYV
 RUN git clone -q https://github.com/tensorflow/models /usr/local/lib/python$PYV/dist-packages/tensorflow/models
 RUN wget -q -P /usr/local/src/ https://github.com/google/protobuf/releases/download/v$PY_VERSION/protobuf-python-$PY_VERSION.tar.gz
 
@@ -70,7 +74,7 @@ WORKDIR /home/patrick/app
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-COPY docker-entrypoint.sh .
+COPY --chown=patrick:users docker-entrypoint.sh .
 RUN chmod 755 ./docker-entrypoint.sh
 CMD bash ./docker-entrypoint.sh
 
