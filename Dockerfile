@@ -1,91 +1,76 @@
-FROM ubuntu:16.04
+FROM tensorflow/tensorflow:nightly-devel-py3
 
-# Install system packages
-RUN apt-get -qq update && apt-get -qq install --no-install-recommends -y python3 \ 
- python3-dev \
- python-pil \
- python-lxml \
- python-tk \
- build-essential \
- cmake \ 
- git \ 
- libgtk2.0-dev \ 
- pkg-config \ 
- libavcodec-dev \ 
- libavformat-dev \ 
- libswscale-dev \ 
- libtbb2 \
- libtbb-dev \ 
- libjpeg-dev \
- libpng-dev \
- libtiff-dev \
- libjasper-dev \
- libdc1394-22-dev \
- x11-apps \
- wget \
- vim \
- ffmpeg \
- unzip \
- && rm -rf /var/lib/apt/lists/* 
+ENV DEBIAN_FRONTEND=noninteractive
+COPY requirements.txt ./
+
+RUN apt update && apt install -y python3 \
+    python3-dev \
+    python-pil \
+    python-lxml \
+    python-tk \
+    build-essential \
+    cmake \ 
+    git \ 
+    libgtk2.0-dev \ 
+    pkg-config \ 
+    libavcodec-dev \ 
+    libavformat-dev \ 
+    libswscale-dev \ 
+    libtbb2 \
+    libtbb-dev \ 
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libjasper-dev \
+    libdc1394-22-dev \
+    x11-apps \
+    wget \
+    vim \
+    ffmpeg \
+    unzip \
+    && rm -rf /var/lib/apt/lists/* 
 
 # Install core packages 
-RUN wget -q -O /tmp/get-pip.py --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 /tmp/get-pip.py
-RUN  pip install -U pip \
- numpy \
- matplotlib \
- notebook \
- jupyter \
- pandas \
- moviepy \
- tensorflow \
- keras \
- autovizwidget \
- opencv-python
+#RUN wget -q -O /tmp/get-pip.py --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 /tmp/get-pip.py
+RUN  pip install -U pip && pip install -r requirements.txt
 
 # Install tensorflow models object detection
-RUN GIT_SSL_NO_VERIFY=true git clone -q https://github.com/tensorflow/models /usr/local/lib/python3.5/dist-packages/tensorflow/models
-RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-python-3.5.1.tar.gz
+RUN PY_VERSION=$(python --version | cut -d" " -f2)
+RUN PYV=$(echo $PY_VERSION | cut -d"." -f1,2)
+RUN git clone -q https://github.com/tensorflow/models /usr/local/lib/python$PYV/dist-packages/tensorflow/models
+RUN wget -q -P /usr/local/src/ https://github.com/google/protobuf/releases/download/v$PY_VERSION/protobuf-python-$PY_VERSION.tar.gz
 
 # Download & build protobuf-python
 RUN cd /usr/local/src/ \
- && tar xf protobuf-python-3.5.1.tar.gz \
- && rm protobuf-python-3.5.1.tar.gz \
- && cd /usr/local/src/protobuf-3.5.1/ \
+ && tar xf protobuf-python-$PY_VERSION.tar.gz \
+ && rm protobuf-python-$PY_VERSION.tar.gz \
+ && cd /usr/local/src/protobuf-$PY_VERSION/ \
  && ./configure \
  && make \
  && make install \
  && ldconfig \
- && rm -rf /usr/local/src/protobuf-3.5.1/
+ && rm -rf /usr/local/src/protobuf-$PY_VERSION/
 
-# Add dataframe display widget
-RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
-
-# Download & build OpenCV
-#RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/opencv/opencv/archive/3.4.1.zip
-#RUN cd /usr/local/src/ \
-# && unzip 3.4.1.zip \
-# && rm 3.4.1.zip \
-# && cd /usr/local/src/opencv-3.4.1/ \
-# && mkdir build \
-# && cd /usr/local/src/opencv-3.4.1/build \ 
-# && cmake -D CMAKE_INSTALL_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local/ .. \
-# && make -j4 \
-# && make install \
-# && rm -rf /usr/local/src/opencv-3.4.1
-
-# Setting up working directory 
-RUN mkdir /lab
-WORKDIR /lab
-#ADD . /lab/
-
-# Minimize image size 
-RUN (apt-get autoremove -y; \
-     apt-get autoclean -y)
+RUN apt-get autoremove -y && apt-get autoclean -y
 
 # Set TF object detection available
-ENV PYTHONPATH "$PYTHONPATH:/usr/local/lib/python3.5/dist-packages/tensorflow/models/research:/usr/local/lib/python3.5/dist-packages/tensorflow/models/research/slim"
-RUN cd /usr/local/lib/python3.5/dist-packages/tensorflow/models/research && protoc object_detection/protos/*.proto --python_out=.
+ENV PYTHONPATH "$PYTHONPATH:/usr/local/lib/python$PYV/dist-packages/tensorflow/models/research:/usr/local/lib/python$PYV/dist-packages/tensorflow/models/research/slim"
+RUN cd /usr/local/lib/python$PYV/dist-packages/tensorflow/models/research \
+    && protoc object_detection/protos/*.proto --python_out=.
+
+
+ARG user_id
+RUN useradd --uid $user_id --group video --shell /bin/bash --create-home patrick
+USER patrick
+
+# Setting up working directory 
+RUN mkdir /home/patrick/app
+WORKDIR /home/patrick/app
+
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
 COPY docker-entrypoint.sh .
 RUN chmod 755 ./docker-entrypoint.sh
 CMD bash ./docker-entrypoint.sh
+
