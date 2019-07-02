@@ -73,6 +73,7 @@ WORKDIR /home/patrick/app
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+ENV QT_X11_NO_MITSHM=1
 
 COPY --chown=patrick:users docker-entrypoint.sh .
 RUN chmod 755 ./docker-entrypoint.sh
