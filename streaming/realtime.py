@@ -36,7 +36,9 @@ def realtime(args):
     if args["output"]:
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         out = cv2.VideoWriter('outputs/{}.avi'.format(args["output_name"]),
-                              fourcc, vs.getFPS() / args["num_workers"], (vs.getWidth(), vs.getHeight()))
+                              fourcc, 
+                              vs.getFPS() / args["num_workers"], 
+                              (vs.getWidth(), vs.getHeight()))
 
 
     # Start reading and treating the video stream
