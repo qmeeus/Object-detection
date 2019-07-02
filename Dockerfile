@@ -62,6 +62,7 @@ ENV PYTHONPATH "$PYTHONPATH:/usr/local/lib/python$PYV/dist-packages/tensorflow/m
 RUN cd /usr/local/lib/python$PYV/dist-packages/tensorflow/models/research \
     && protoc object_detection/protos/*.proto --python_out=.
 
+RUN pip install ffmpeg-python
 
 ARG user_id
 RUN useradd --uid $user_id --group video --shell /bin/bash --create-home patrick

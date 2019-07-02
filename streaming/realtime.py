@@ -1,8 +1,9 @@
+import numpy as np
 import multiprocessing
 from multiprocessing import Queue, Pool
 import cv2, os
 import subprocess
-from io import StringIO
+import ffmpeg
 
 from utils.app_utils import *
 from utils.detection import *
@@ -61,6 +62,14 @@ def realtime(args):
         print("=====================================================================")
         print()
 
+    process = (
+        ffmpeg
+        .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(vs.getWidth(), vs.getHeight()))
+        .output('rtmp://10.1.129.22/live/cam2', format='flv', preset='slower', movflags='faststart', pix_fmt='rgb24')
+        .overwrite_output()
+        .run_async(pipe_stdin=True)
+    )
+
     countFrame = 0
     while True:
         # Capture frame-by-frame
@@ -69,6 +78,12 @@ def realtime(args):
         if ret:
             input_q.put(frame)
             output_rgb = cv2.cvtColor(output_q.get(), cv2.COLOR_RGB2BGR)
+
+            process.stdin.write(
+                output_rgb
+                .astype(np.uint8)
+                .tobytes()
+            )
 
             # write the frame
             if args["output"]:
@@ -94,10 +109,13 @@ def realtime(args):
         if not is_started:
             is_started = 1
             # subprocess.Popen(['bash', 'stream.sh', '-'], stdout=subprocess.PIPE)
-            sh('bash', 'stream.sh', filename)
+            # sh('bash', 'stream.sh', filename)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+    process.stdin.close()
+    process.wait()
 
     # When everything done, release the capture
     fps.stop()
