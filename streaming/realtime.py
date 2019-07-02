@@ -34,9 +34,8 @@ def realtime(args):
 
     # Define the output codec and create VideoWriter object
     if args["output"]:
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
         out = cv2.VideoWriter('outputs/{}.avi'.format(args["output_name"]),
-                              fourcc, 
+                              cv2.VideoWriter_fourcc(*'XVID'), 
                               vs.getFPS() / args["num_workers"], 
                               (vs.getWidth(), vs.getHeight()))
 
@@ -67,7 +66,7 @@ def realtime(args):
                 ## full screen
                 if args["full_screen"]:
                     cv2.namedWindow("frame", cv2.WND_PROP_FULLSCREEN)
-                    cv2.setWindowProperty("frame",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+                    cv2.setWindowProperty("frame", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
                 cv2.imshow("frame", output_rgb)
 
                 fps.update()
