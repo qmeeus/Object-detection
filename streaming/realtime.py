@@ -1,15 +1,28 @@
 import multiprocessing
 from multiprocessing import Queue, Pool
-import cv2
+import cv2, os
+import subprocess
+from io import StringIO
 
 from utils.app_utils import *
 from utils.detection import *
 
 
+def sh(*args):
+    with subprocess.Popen(args, stdout=subprocess.PIPE) as proc:
+        out = proc.stdout.read()
+        return out.decode('utf-8')
+
 def realtime(args):
     """
     Read and apply object detection to input real time stream (webcam)
     """
+
+    is_started = 0
+
+    filename = 'outputs/{}.avi'.format(args["output_name"])
+    if os.path.exists(filename):
+        os.remove(filename)
 
     args = args.copy()
 
@@ -34,7 +47,7 @@ def realtime(args):
 
     # Define the output codec and create VideoWriter object
     if args["output"]:
-        out = cv2.VideoWriter('outputs/{}.avi'.format(args["output_name"]),
+        out = cv2.VideoWriter(filename,
                               cv2.VideoWriter_fourcc(*'XVID'), 
                               vs.getFPS() / args["num_workers"], 
                               (vs.getWidth(), vs.getHeight()))
@@ -77,6 +90,11 @@ def realtime(args):
         else:
             print('End of stream')
             break
+
+        if not is_started:
+            is_started = 1
+            # subprocess.Popen(['bash', 'stream.sh', '-'], stdout=subprocess.PIPE)
+            sh('bash', 'stream.sh', filename)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

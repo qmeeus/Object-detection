@@ -1,5 +1,8 @@
 #!/bin/bash
 #src:
+
+mkfifo /tmp/stream
+
 python3 main.py \
     --display 1 --output 1 \
     --num-workers 2 -q-size 150 \
