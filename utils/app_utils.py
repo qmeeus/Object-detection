@@ -3,6 +3,8 @@ from threading import Thread
 import datetime
 import cv2
 
+__all__ = ['FPS', 'WebcamVideoStream']
+
 class FPS:
     def __init__(self):
         # store the start time, end time, and total number of frames

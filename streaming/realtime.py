@@ -1,15 +1,17 @@
-from __future__ import print_function
-from utils.app_utils import *
-from utils.objDet_utils import *
-import argparse
 import multiprocessing
 from multiprocessing import Queue, Pool
 import cv2
+
+from utils.app_utils import *
+from utils.detection import *
+
 
 def realtime(args):
     """
     Read and apply object detection to input real time stream (webcam)
     """
+
+    args = args.copy()
 
     # If display is off while no number of frames limit has been define: set diplay to on
     if((not args["display"]) & (args["num_frames"] < 0)):
@@ -68,9 +70,11 @@ def realtime(args):
 
                 fps.update()
             elif countFrame >= args["num_frames"]:
+                print('End of frame')
                 break
 
         else:
+            print('End of stream')
             break
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
