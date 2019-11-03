@@ -4,8 +4,8 @@ from queue import PriorityQueue
 import cv2
 
 
-from utils.app_utils import *
-from utils.detection import *
+from app.utils.app_utils import *
+from app.utils.detection import *
 
 
 def video(args):

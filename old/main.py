@@ -13,9 +13,10 @@ def parse_args():
     ap.add_argument("-d", "--display", type=int, default=0, help="Whether or not frames should be displayed")
     ap.add_argument("-o", "--output", type=int, default=0, help="Whether or not modified videos shall be writen")
     ap.add_argument("-on", "--output-name", type=str, default="output", help="Name of the output video file")
-    ap.add_argument("-I", "--input-device", type=str, default=0, help="Device number input")
-    ap.add_argument("-i", "--input-videos", type=str, default="", help="Path to videos input, overwrite device input if used")
-    ap.add_argument('-s', '--stream', action='store_true', default=False)
+    ap.add_argument("-I", "--input-stream", type=str, required=True, help="Input stream url")
+    ap.add_argument("-O", "--output-stream", type=str, required=True, help="Output stream url")
+    # ap.add_argument("-i", "--input-videos", type=str, default="", help="Path to videos input, overwrite device input if used")
+    # ap.add_argument('-s', '--stream', action='store_true', default=False)
     ap.add_argument('-w', '--num-workers', dest='num_workers', type=int, default=2, help='Number of workers.')
     ap.add_argument('-q-size', '--queue-size', dest='queue_size', type=int, default=5, help='Size of the queue.')
     ap.add_argument('-l', '--logger-debug', dest='logger_debug', type=int, default=0, help='Print logger debug')
@@ -30,5 +31,6 @@ def parse_args():
 if __name__ == '__main__':
 
     args = parse_args()
-    streaming_func = video if not args['stream'] and args['input_videos'] != "" else realtime
-    streaming_func(args)
+    # streaming_func = video if not args['stream'] and args['input_videos'] != "" else realtime
+    # streaming_func(args)
+    realtime(args)

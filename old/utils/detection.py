@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-from utils.app_utils import *
+from app.utils.app_utils import FPS
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
@@ -11,10 +11,10 @@ __all__ = ['detect_objects', 'worker']
 
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_CKPT = 'model/frozen_inference_graph.pb'
+PATH_TO_CKPT = 'models/mscoco/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = 'model/mscoco_label_map.pbtxt'
+PATH_TO_LABELS = 'models/mscoco/mscoco_label_map.pbtxt'
 
 NUM_CLASSES = 90
 
@@ -66,19 +66,16 @@ def worker(input_q, output_q):
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
-        sess = tf.Session(graph=detection_graph)
+        
+    with tf.Session(graph=detection_graph) as sess, FPS() as fps:
+        while True:
+            fps.update()
+            frame = input_q.get()
 
-    fps = FPS().start()
-    while True:
-        fps.update()
-        frame = input_q.get()
-
-        # Check frame object is a 2-D array (video) or 1-D (webcam)
-        if len(frame) == 2:
-            frame_rgb = cv2.cvtColor(frame[1], cv2.COLOR_BGR2RGB)
-            output_q.put((frame[0], detect_objects(frame_rgb, sess, detection_graph)))
-        else:
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            output_q.put(detect_objects(frame_rgb, sess, detection_graph))
-    fps.stop()
-    sess.close()
+            # Check frame object is a 2-D array (video) or 1-D (webcam)
+            if len(frame) == 2:
+                frame_rgb = cv2.cvtColor(frame[1], cv2.COLOR_BGR2RGB)
+                output_q.put((frame[0], detect_objects(frame_rgb, sess, detection_graph)))
+            else:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                output_q.put(detect_objects(frame_rgb, sess, detection_graph))
