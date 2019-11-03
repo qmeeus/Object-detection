@@ -9,5 +9,7 @@ services:
     build:
       context: .
     env_file: local.env
+    volumes:
+      - $PWD/videos:/home/tensorflow/videos
     depends_on:
       - nginx-rtmp
