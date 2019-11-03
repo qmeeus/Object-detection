@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from streaming import *
+from old.streaming import *
 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
