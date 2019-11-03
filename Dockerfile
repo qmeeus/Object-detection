@@ -19,6 +19,8 @@ ENV QT_X11_NO_MITSHM=1
 
 COPY --chown=$user:users ./models ./models
 COPY --chown=$user:users ./realtime_object_detection ./realtime_object_detection
+COPY --chown=$user:users ./old ./old
 
-CMD python -m realtime_object_detection
+# CMD python -m realtime_object_detection
 # CMD python -m realtime_object_detection.deepdream
+CMD bash old/docker-entrypoint.sh
