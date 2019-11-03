@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  nginx-rtmp:
+    image: tiangolo/nginx-rtmp
+    ports:
+      - "1935:1935"
+  object-detection:
+    build:
+      context: .
+    env_file: local.env
+    depends_on:
+      - nginx-rtmp
