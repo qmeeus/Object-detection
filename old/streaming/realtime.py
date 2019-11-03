@@ -5,8 +5,8 @@ import cv2, os
 import subprocess
 import ffmpeg
 
-from utils.app_utils import *
-from utils.detection import *
+from app.utils.app_utils import *
+from app.utils.detection import *
 
 
 def sh(*args):
@@ -64,7 +64,8 @@ def realtime(args):
 
     process = (
         ffmpeg
-        .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(vs.getWidth(), vs.getHeight()))
+        # .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(vs.getWidth(), vs.getHeight()))
+        .input(args['input_stream'], format='rawvideo', pix_fmt='rgb24')
         .output('rtmp://10.1.129.22/live/cam2', format='flv', preset='slower', movflags='faststart', pix_fmt='rgb24')
         .overwrite_output()
         .run_async(pipe_stdin=True)

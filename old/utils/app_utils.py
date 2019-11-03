@@ -1,9 +1,10 @@
 # import the necessary packages
 from threading import Thread
-import datetime
+import datetime as dt
 import cv2
 
 __all__ = ['FPS', 'WebcamVideoStream']
+
 
 class FPS:
     def __init__(self):
@@ -15,12 +16,12 @@ class FPS:
 
     def start(self):
         # start the timer
-        self._start = datetime.datetime.now()
+        self._start = dt.datetime.now()
         return self
     
     def stop(self):
         # stop the timer
-        self._end = datetime.datetime.now()
+        self._end = dt.datetime.now()
 
     def update(self):
         # increment the total number of frames examined during the
@@ -36,7 +37,7 @@ class FPS:
         # compute the (approximate) frames per second
         return self._numFrames / self.elapsed()
 
-    
+
 class WebcamVideoStream:
     def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
