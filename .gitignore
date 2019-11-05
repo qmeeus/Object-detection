@@ -5,6 +5,7 @@ tmp/
 test_data/
 preprocessed_data/
 *_results
+models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
