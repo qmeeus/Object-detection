@@ -6,7 +6,7 @@ import tensorflow as tf
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-
+from realtime_object_detection.utils.logger import logger
 
 class ObjectDetection:
 
@@ -65,9 +65,10 @@ class ObjectDetection:
             np.squeeze(boxes),
             np.squeeze(classes).astype(np.int32),
             np.squeeze(scores),
-            category_index,
+            self.category_index,
             use_normalized_coordinates=True,
-            line_thickness=4)
+            line_thickness=4
+        )
 
         logger.debug(f'input shape: {frame_rgb.shape}, output_shape: {processed_image.shape}')
 
