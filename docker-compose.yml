@@ -2,14 +2,18 @@ version: '3'
 
 services:
   nginx-rtmp:
-    image: tiangolo/nginx-rtmp
+    image: docker.io/jasonrivers/nginx-rtmp
     ports:
       - "1935:1935"
+      - "8080:8080"
+    environment:
+      - RTMP_STREAM_NAMES=live,ramon
   object-detection:
     build:
       context: .
     env_file: local.env
     volumes:
       - $PWD/videos:/home/tensorflow/videos
+      - $PWD/realtime_object_detection:/home/tensorflow/realtime_object_detection
     depends_on:
       - nginx-rtmp
