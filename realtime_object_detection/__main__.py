@@ -48,7 +48,7 @@ output_stream = OutputStream(
     input_cfg={"format": "rawvideo", "s": "{}x{}".format(*input_stream.video_size)},
     # filter_cfg={"fps": fps / 2, "round": "up"},
     output_cfg={
-        "format": "flv", "pix_fmt": "rgb24", 'preset': 'slower', 
+        "format": "flv", "pix_fmt": "yuv420p", 'preset': 'slower', 
         "movflags": "faststart", "qscale:v": 3
     }
 )
