@@ -15,6 +15,6 @@ services:
     volumes:
       - $PWD/videos:/home/tensorflow/videos
       - $PWD/models:/home/tensorflow/models
-      - $PWD/realtime_object_detection:/home/tensorflow/realtime_object_detection
+      # - $PWD/realtime_object_detection:/home/tensorflow/realtime_object_detection
     depends_on:
       - nginx-rtmp
