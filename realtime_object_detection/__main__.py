@@ -1,5 +1,6 @@
 import os, os.path as p
-from time import sleep
+import sys
+from time import sleep, time
 import numpy as np
 import ffmpeg
 import subprocess
@@ -11,42 +12,27 @@ from realtime_object_detection.io import InputStream, OutputFile, OutputStream
 from realtime_object_detection.utils.logger import logger
 
 
+BATCH_SIZE = 1
+FPS = 30
+
+
 def abspath(relpath):
     return p.abspath(p.join(p.dirname(__file__), '..', relpath))    
 
 
-# def task(queue_in, queue_out):
-    
-
-#     while not queue_in.is_empty():
-
-#         frame_nr, frame = queue_in.get()
-#         frame_out = detector.detect_objects(frame)
-#         queue_out.put((frame_nr, frame_out))
-#         queue_in.task_done()
-
-
-
-# def process_frame(detector, queue_in):
-#     frame_nr, frame = queue_in.get()
-#     frame_out = detector.detect_objects(frame)
-#     queue_in.task_done()
-#     return frame_nr, frame_out
-
-
-input_stream = InputStream(os.environ['INPUT_STREAM_URL'], 10000)
+logger.info('       REALTIME OBJECT DETECTION       ')
+input_stream = InputStream(os.environ['INPUT_STREAM_URL'], 1000, FPS)
 input_stream.start()
 
-fps = input_stream.getFPS()
+# fps = input_stream.getFPS()
 output_file = OutputFile(abspath(os.environ['OUTPUT_FILE']), 'XVID', {
-    'fps': fps,
-    'frameSize': input_stream.video_size
+    'fps': FPS, 'frameSize': input_stream.video_size
 })
 
 output_stream = OutputStream(
     os.environ['OUTPUT_STREAM_URL'],
     input_cfg={"format": "rawvideo", "s": "{}x{}".format(*input_stream.video_size)},
-    # filter_cfg={"fps": fps / 2, "round": "up"},
+    filter_cfg={"fps": FPS, "round": "up"},
     output_cfg={
         "format": "flv", "pix_fmt": "yuv420p", 'preset': 'slower', 
         "movflags": "faststart", "qscale:v": 3
@@ -60,35 +46,23 @@ outputs = [
 
 try:
     
-    logger.info('Start writing video')
-    
-    n_workers = os.environ.get('N_WORKERS', 5)
-    logger.debug("Start pool")
-
+    logger.info('       +++  Processing starts  +++')
     detector = ObjectDetection()
-
-    # with Pool(n_workers) as pool:
-
+    
     while not input_stream.is_empty:
 
-        logger = log_to_stderr('DEBUG')
-        # logger.debug(f'{input_stream.queue.qsize()} items left in the queue')
+        batch_size = min(BATCH_SIZE, input_stream.size)
+        frame_ids, frames = map(list, zip(*((input_stream.read() for _ in range(batch_size)))))
+        # logger.debug(f'Batch size: {batch_size}    Remaining: {input_stream.size}')
 
-        # tasks = [
-        #     pool.apply_async(process_frame, (detector, input_stream.queue))
-        #     for _ in range(n_workers)
-        # ]
+        assert type(frame_ids) is list
+        assert type(frames) is list
 
-        frame_nr, frame = input_stream.read()
-        frame_out = detector.detect_objects(frame)
+        frames_out = detector.detect_objects(frames)
 
-        # for task in tasks:
-        #     task.wait()
-        #     frame_nr, frame_out = task.get()
-        #     _logger.debug(f"Finished frame n°{frame_nr}")
-
-        for output in outputs:
-            output.write_frame(frame_out)
+        for frame_out in frames_out:
+            for output in outputs:
+                output.write_frame(frame_out)
 
 except KeyboardInterrupt:
 

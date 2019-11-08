@@ -4,13 +4,13 @@ import cv2
 
 class OutputStream:
 
-    def __init__(self, dest, input_cfg, output_cfg):
+    def __init__(self, dest, input_cfg, filter_cfg, output_cfg):
         self.dest = dest
 
         self.process = (
             ffmpeg
             .input('pipe:', **input_cfg)
-            # .filter('fps', **filter_cfg)
+            .filter('fps', **filter_cfg)
             .output(dest, **output_cfg)
             .overwrite_output()
             .run_async(pipe_stdin=True)
