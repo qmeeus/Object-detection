@@ -13,6 +13,7 @@ from realtime_object_detection.utils.logger import logger
 
 
 BATCH_SIZE = 1
+QUEUE_SIZE = 10000
 FPS = 30
 
 
@@ -21,7 +22,7 @@ def abspath(relpath):
 
 
 logger.info('       REALTIME OBJECT DETECTION       ')
-input_stream = InputStream(os.environ['INPUT_STREAM_URL'], 1000, FPS)
+input_stream = InputStream(os.environ['INPUT_STREAM_URL'], QUEUE_SIZE, FPS)
 input_stream.start()
 
 # fps = input_stream.getFPS()

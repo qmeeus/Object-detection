@@ -9,12 +9,13 @@ services:
     environment:
       - RTMP_STREAM_NAMES=live,ramon
   object-detection:
-    build:
-      context: .
+    image: docker.io/qmeeus/object-detection:full
+    # build:
+    #   context: .
     env_file: local.env
     volumes:
       - $PWD/videos:/home/tensorflow/videos
-      - $PWD/models:/home/tensorflow/models
+      # - $PWD/models:/home/tensorflow/models
       # - $PWD/realtime_object_detection:/home/tensorflow/realtime_object_detection
     depends_on:
       - nginx-rtmp

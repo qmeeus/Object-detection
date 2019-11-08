@@ -11,9 +11,9 @@ from realtime_object_detection.utils.logger import logger
 
 class ObjectDetection:
 
-    PATH_TO_CKPT = 'models/mscoco/frozen_inference_graph.pb'
-    PATH_TO_LABELS = 'models/mscoco/mscoco_label_map.pbtxt'
-    # PATH_TO_CKPT = 'models/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb'
+    # PATH_TO_CKPT = 'models/mscoco/frozen_inference_graph.pb'
+    PATH_TO_LABELS = 'models/mscoco_label_map.pbtxt'
+    PATH_TO_CKPT = 'models/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb'
     NUM_CLASSES = 90
 
 
