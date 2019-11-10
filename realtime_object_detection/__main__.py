@@ -54,7 +54,6 @@ try:
 
         batch_size = min(BATCH_SIZE, input_stream.size)
         frame_ids, frames = map(list, zip(*((input_stream.read() for _ in range(batch_size)))))
-        # logger.debug(f'Batch size: {batch_size}    Remaining: {input_stream.size}')
 
         assert type(frame_ids) is list
         assert type(frames) is list

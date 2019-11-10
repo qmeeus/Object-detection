@@ -17,7 +17,7 @@ class OutputStream:
         )
 
     def write_frame(self, frame):
-        self.process.stdin.write(frame)
+        self.process.stdin.write(frame.tobytes())
 
     def clean(self):
         self.process.stdin.close()
