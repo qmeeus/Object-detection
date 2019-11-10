@@ -62,7 +62,7 @@ class ObjectDetection:
         classes = self.T('detection_classes')
         num_detections = self.T('num_detections')
 
-        # logger.info(f'    Detection starts, size: {image_array.shape}')
+        logger.debug(f'Detection starts, size: {image_array.shape}')
 
         # Actual detection.
         start = time.time()
@@ -77,13 +77,13 @@ class ObjectDetection:
             self._prediction_time += t
             self._number_of_predictions += bs
             self._number_of_batches += 1
-            # logger.debug(f"Batch n°{self._number_of_batches}: size={bs}")
-            # logger.debug(f'total time={t:.2f}, time={t / bs:.2f}, fps={self.average_time:.2f}')
-            # logger.debug("Batch sizes: {[len(array) for array in return_values]}")
+            logger.debug(f"Batch n°{self._number_of_batches}: size={bs}")
+            logger.debug(f'total time={t:.2f}, time={t / bs:.2f}, fps={self.average_time:.2f}')
             return list(map(self.add_boxes, frames, *return_values))
 
         except Exception as err:
-            print(image_array)
+            # self.logger.exception(err)
+            # self.logger.error(image_array)
             raise err
 
     def add_boxes(self, frame, boxes, scores, classes, num_detections):
@@ -99,7 +99,7 @@ class ObjectDetection:
             line_thickness=4
         )
 
-        # logger.debug(f'input shape: {frame.shape}, output_shape: {processed_image.shape}')
+        logger.debug(f'input shape: {frame.shape}, output_shape: {processed_image.shape}')
 
         return processed_image
 
@@ -112,8 +112,8 @@ class ObjectDetection:
 
     @property
     def average_time(self):
-        return self._number_of_predictions / self._prediction_time
+        return self._prediction_time / self._number_of_predictions
 
     @property
     def average_batch_time(self):
-        return self._number_of_batches / self._prediction_time
+        return self._prediction_time / self._number_of_batches

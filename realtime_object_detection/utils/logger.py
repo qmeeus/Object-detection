@@ -3,7 +3,7 @@ import logzero
 import logging
 from logzero import logger
 
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'))
 
 logdir = p.expanduser("~/logs")
 os.makedirs(logdir, exist_ok=True)

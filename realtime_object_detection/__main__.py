@@ -47,11 +47,12 @@ outputs = [
 
 try:
     
-    logger.info('       +++  Processing starts  +++')
+    logger.info('+++  Processing starts  +++')
     detector = ObjectDetection()
     
     while not input_stream.is_empty:
 
+        logger.debug(f'{input_stream.size} remaining frames in queue')
         batch_size = min(BATCH_SIZE, input_stream.size)
         frame_ids, frames = map(list, zip(*((input_stream.read() for _ in range(batch_size)))))
 
